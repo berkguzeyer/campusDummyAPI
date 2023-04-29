@@ -1,11 +1,10 @@
 package campusAPITest.models;
 
-public class Country {
+public class Citizenships {
 
     private String name;
-    private String code;
+    private String shortName;
     private String id;
-
 
     public String getName() {
         return name;
@@ -15,12 +14,12 @@ public class Country {
         this.name = name;
     }
 
-    public String getCode() {
-        return code;
+    public String getShortName() {
+        return shortName;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     public String getId() {
@@ -31,11 +30,12 @@ public class Country {
         this.id = id;
     }
 
+
     @Override
     public String toString() {
-        return "Country{" +
+        return "Citizenships{" +
                 "name='" + name + '\'' +
-                ", code='" + code + '\'' +
+                ", shortName='" + shortName + '\'' +
                 ", id='" + id + '\'' +
                 '}';
     }

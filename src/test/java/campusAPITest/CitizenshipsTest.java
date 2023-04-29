@@ -1,8 +1,7 @@
 package campusAPITest;
 
-import campusAPITest.models.Country;
+import campusAPITest.models.Citizenships;
 import io.restassured.http.ContentType;
-import io.restassured.http.Cookie;
 import io.restassured.http.Cookies;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -12,22 +11,23 @@ import org.testng.annotations.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
+import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
-public class CountryTest {
+public class CitizenshipsTest {
 
-    public String randomCountryName() {
+
+    public String randomCitizenshipName() {
         return RandomStringUtils.randomAlphabetic(8);
     }
 
-    public String randomCode() {
+    public String randomshortName() {
         return RandomStringUtils.randomAlphabetic(4);
     }
 
 
     Cookies cookies;
-
 
     @BeforeClass
     public void login() {
@@ -52,92 +52,82 @@ public class CountryTest {
 
     }
 
-
-    Country country;
-    String countryId;
     Response response;
+    Citizenships citizenship;
 
-    @Test
-    public void createCountry() {
+    @Test(priority = 1)
+    public void createCitizenship() {
 
-        country = new Country();
-        country.setName(randomCountryName());
-        country.setCode(randomCode());
+        citizenship = new Citizenships();
+        citizenship.setName(randomCitizenshipName());
+        citizenship.setShortName(randomshortName());
 
         response = given()
-                .body(country)
+                .body(citizenship)
                 .contentType(ContentType.JSON)
                 .cookies(cookies)
-
                 .when()
-                .post("/school-service/api/countries")
-
+                .post("/school-service/api/citizenships")
                 .then()
-                .log().body()
                 .statusCode(201)
+                .log().body()
                 .extract().response();
 
-
     }
 
-    @Test(dependsOnMethods = "createCountry", priority = 1)
-    public void createCountryNegativeTest() {
-
-
+    @Test(dependsOnMethods = "createCitizenship", priority = 2)
+    public void createCitizenshipNegativeTest() {
         given()
-                .body(country)
+                .body(citizenship)
                 .contentType(ContentType.JSON)
                 .cookies(cookies)
-
                 .when()
-                .post("/school-service/api/countries")
+                .post("/school-service/api/citizenships")
                 .then()
                 .statusCode(400);
-
     }
 
-    @Test(dependsOnMethods = "createCountry", priority = 2)
-    public void updateCountry() {
+    @Test(dependsOnMethods = "createCitizenship", priority = 3)
+    public void updateCitizenship() {
 
-        country.setId(response.jsonPath().getString("id"));
-        country.setName(randomCountryName());
-        country.setCode(randomCode());
+        citizenship.setId(response.jsonPath().getString("id"));
+        citizenship.setName(randomCitizenshipName());
+        citizenship.setShortName(randomshortName());
 
         given()
-                .body(country)
+                .body(citizenship)
                 .contentType(ContentType.JSON)
                 .cookies(cookies)
                 .when()
-                .put("/school-service/api/countries")
+                .put("/school-service/api/citizenships")
                 .then()
                 .statusCode(200);
     }
 
 
-    @Test(dependsOnMethods = "createCountry", priority = 3)
-    public void deleteCountry() {
+    @Test(dependsOnMethods = "createCitizenship", priority = 4)
+    public void deleteCitizenship() {
+
 
         given()
+                .pathParam("citizenshipId", response.jsonPath().getString("id"))
                 .cookies(cookies)
-                .pathParam("countryId", response.jsonPath().getString("id"))
                 .when()
-                .delete("/school-service/api/countries/{countryId}")
+                .delete("school-service/api/citizenships/{citizenshipId}")
                 .then()
                 .statusCode(200);
 
     }
 
-    @Test(dependsOnMethods = {"createCountry", "deleteCountry"}, priority = 4)
-    public void deleteCountryNegativeTest() {
-
+    @Test(dependsOnMethods = {"createCitizenship", "deleteCitizenship"}, priority = 5)
+    public void deleteCitizenshipNegativeTest() {
         given()
+                .pathParam("citizenshipId", response.jsonPath().getString("id"))
                 .cookies(cookies)
-                .pathParam("countryId", response.jsonPath().getString("id"))
                 .when()
-                .delete("/school-service/api/countries/{countryId}")
+                .delete("school-service/api/citizenships/{citizenshipId}")
                 .then()
                 .statusCode(400);
-
     }
 
 
